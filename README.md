@@ -1,4 +1,12 @@
-# distance_by_plane_in_switzerland_in_2015
-This code computes the total distance of trips by plane per person in 2015, based on the data of the Transport and Mobility Microcensus (<a href="www.are.admin.ch/mtmc">MTMC</a>). On average, every Swiss residents traveled 5015 km by plane in 2015.
+# Average distance made by plane per Swiss resident in 2015
+This code computes the average distance made by plane per Swiss resident in 2015, in km, based on the data of the Transport and Mobility Microcensus (<a href="www.are.admin.ch/mtmc">MTMC</a>). 
 
-This result has been published in the magazine of the Swiss Federal Office for Spatial Development (ARE, www.are.admin.ch), "Forum Raumentwicklung"/"Forum du développement territorial"/"" (not available in English).
+## Getting the code to run
+
+These instructions will explain what you need to get the project running.
+
+### Prerequisites
+
+To run the code itself, you need python 3, pandas and numpy.
+
+You also need the raw data of the Transport and Mobility Microcensus, not included on GitHub.
