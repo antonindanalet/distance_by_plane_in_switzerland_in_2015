@@ -1,5 +1,5 @@
-# Average distance made by plane per person in Switzerland in 2015
-This code computes the average distance made by plane per person in Switzerland (Swiss residents) in 2015, in km, based on the data of the Transport and Mobility Microcensus (<a href="www.are.admin.ch/mtmc">MTMC</a>). 
+# Average distance made by plane per Swiss resident in 2015
+This code computes the average distance made by plane per Swiss residents (i.e., people living in Switzerland but traveling by plane all around the world) in 2015, in km, based on the data of the Transport and Mobility Microcensus (<a href="www.are.admin.ch/mtmc">MTMC</a>). 
 
 ## Getting Started
 
