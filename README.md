@@ -20,7 +20,3 @@ DO NOT commit or share in any way these two CSV-files! These are personal data.
 ## Contact
 
 Please don't hesitate to contact me if you have questions or comments about this code: antonin.danalet@are.admin.ch
-
-## Acknowledgment
-
-Thanks to Jean-Luc Muralti, who has helped by answering to multiple questions about this result.
