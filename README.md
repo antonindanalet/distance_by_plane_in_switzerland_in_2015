@@ -1,7 +1,7 @@
 # Average distance made by plane per Swiss resident in 2015
 This code computes the average distance made by plane per Swiss residents (i.e., people living in Switzerland but traveling by plane all around the world) in 2015, in km, based on the data of the Transport and Mobility Microcensus (<a href="www.are.admin.ch/mtmc">MTMC</a>). On average, every Swiss resident traveled 5015 km by plane in 2015 for non-business trips. 
 
-This result has been published in the magazine of the Swiss Federal Office for Spatial Development (<a href="www.are.admin.ch">ARE</a>), "<a href="https://www.are.admin.ch/are/de/home/medien-und-publikationen/forum-raumentwicklung.html">Forum Raumentwicklung</a>"/"<a href="https://www.are.admin.ch/are/fr/home/media-et-publications/forum-du-developpement-territorial.html">Forum du développement territorial</a>"/"<a href="https://www.are.admin.ch/are/it/home/media-e-pubblicazioni/forum-sviluppo-territoriale.html">Forum sviluppo territoriale</a>" (not available in English).
+This result has been published in the magazine of the Swiss Federal Office for Spatial Development (<a href="www.are.admin.ch">ARE</a>), "<a href="https://www.are.admin.ch/are/de/home/medien-und-publikationen/forum-raumentwicklung.html">Forum Raumentwicklung</a>"/"<a href="https://www.are.admin.ch/are/fr/home/media-et-publications/forum-du-developpement-territorial.html">Forum du développement territorial</a>"/"<a href="https://www.are.admin.ch/are/it/home/media-e-pubblicazioni/forum-sviluppo-territoriale.html">Forum sviluppo territoriale</a>" (not available in English), 02.2018, entitled "Mobilität der Zukunft"/"La mobilité du futur"/"La mobilità del futuro".
 
 ## Getting Started
 
