@@ -68,29 +68,30 @@ def run_distance_by_plane_in_switzerland_in_2015():
     weight_detailed_trips = df_zp_with_trips['WP'].sum()
     # Correction factor for people declaring they did trips, but without detailing them
     correction_factor_declared_detailed_trips = weight_declared_trips / weight_detailed_trips
-    # Trips have been asked for 3 months and must be extrapolated for a year
-    extrapolation_factor_3_months_to_1_year = 365.0 / 120
-    print('Total distance of trips by plane per person and per year, in km:',
+    # Trips have been asked for 4 months on the phone in the MTMC and must be extrapolated for a year
+    extrapolation_factor_4_months_to_1_year = 365.0 / 120
+    print('Average distance made by plane per person in 2015, in km:',
           (df_zp_with_trips['WP'] * df_zp_with_trips['total_distance_extrapolated']).sum() *
           correction_factor_declared_detailed_trips /
           (df_zp_with_trips['WP'].sum() * correction_factor_declared_detailed_trips + df_zp_without_trips['WP'].sum())
-          * extrapolation_factor_3_months_to_1_year)
+          * extrapolation_factor_4_months_to_1_year)
     # Result: 5924.873511771452
+    print('--- Among which; ---')
     print('Only private trips:',
           (df_zp_with_trips['WP'] * df_zp_with_trips['total_distance_extrapolated_private']).sum() *
           correction_factor_declared_detailed_trips /
           (df_zp_with_trips['WP'].sum() * correction_factor_declared_detailed_trips + df_zp_without_trips['WP'].sum())
-          * extrapolation_factor_3_months_to_1_year)
+          * extrapolation_factor_4_months_to_1_year)
     print('Only business trips:',
           (df_zp_with_trips['WP'] * df_zp_with_trips['total_distance_extrapolated_business']).sum() *
           correction_factor_declared_detailed_trips /
           (df_zp_with_trips['WP'].sum() * correction_factor_declared_detailed_trips + df_zp_without_trips['WP'].sum())
-          * extrapolation_factor_3_months_to_1_year)
+          * extrapolation_factor_4_months_to_1_year)
     print('Only other trips:',
           (df_zp_with_trips['WP'] * df_zp_with_trips['total_distance_extrapolated_other']).sum() *
           correction_factor_declared_detailed_trips /
           (df_zp_with_trips['WP'].sum() * correction_factor_declared_detailed_trips + df_zp_without_trips['WP'].sum())
-          * extrapolation_factor_3_months_to_1_year)
+          * extrapolation_factor_4_months_to_1_year)
 
 
 def get_zp_renamed():
