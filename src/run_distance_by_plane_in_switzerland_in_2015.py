@@ -6,6 +6,7 @@ def run_distance_by_plane_in_switzerland_in_2015():
     df_zp = get_zp_renamed()
     # select only people who were asked questions about trips with overnights (module 1b, encoded 2)
     df_zp = df_zp[df_zp['module_attributed_to_the_respondent'] == 2]
+    df_zp.drop(columns=['module_attributed_to_the_respondent'], inplace=True)
     # select only people who said the number of trips with overnights they made
     df_zp_with_trips = df_zp[df_zp['nb_trips_with_overnights'] > 0]
     df_zp_without_trips = df_zp[df_zp['nb_trips_with_overnights'] == 0]
@@ -76,6 +77,12 @@ def run_distance_by_plane_in_switzerland_in_2015():
           (df_zp_with_trips['WP'].sum() * correction_factor_declared_detailed_trips + df_zp_without_trips['WP'].sum())
           * extrapolation_factor_4_months_to_1_year)
     # Result: 5924.873511771452
+    age_bins_with_trips = pd.cut(df_zp_with_trips['age'], [5, 17, 24, 44, 64, 79, 100])
+    age_bins_without_trips = pd.cut(df_zp_without_trips['age'], [5, 17, 24, 44, 64, 79, 100])
+    print(df_zp_with_trips.groupby(age_bins_with_trips).apply(lambda df:
+                                                              (df['WP'] * df['total_distance_extrapolated']).sum()) /
+          df_zp_with_trips.groupby(age_bins_with_trips)['WP'].sum() * correction_factor_declared_detailed_trips +
+          df_zp_without_trips.groupby(age_bins_without_trips)['WP'].sum())
     print('--- Among which; ---')
     print('Only private trips:',
           (df_zp_with_trips['WP'] * df_zp_with_trips['total_distance_extrapolated_private']).sum() *
@@ -95,11 +102,12 @@ def run_distance_by_plane_in_switzerland_in_2015():
 
 
 def get_zp_renamed():
-    selected_columns = ['HHNR', 'WP', 'dmod', 'f70100']
+    selected_columns = ['HHNR', 'WP', 'dmod', 'f70100', 'alter']
     df_zp = get_zp(year=2015, selected_columns=selected_columns)
     # Rename variables
     df_zp = df_zp.rename(columns={'dmod': 'module_attributed_to_the_respondent',
-                                  'f70100': 'nb_trips_with_overnights'})
+                                  'f70100': 'nb_trips_with_overnights',
+                                  'alter': 'age'})
     return df_zp
 
 
