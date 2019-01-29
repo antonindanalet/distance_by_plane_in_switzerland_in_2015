@@ -4,7 +4,7 @@ import os.path
 
 def get_zp(year, selected_columns=None):
     if year == 2015:
-        path_2_zielpersonen = os.path.join('..', 'data', 'zielpersonen.csv')
+        path_2_zielpersonen = os.path.join('..', 'data', 'input', 'zielpersonen.csv')
         if os.path.isfile(path_2_zielpersonen):
             with open(path_2_zielpersonen, 'r', encoding='latin1') as zielpersonen_file:
                 if selected_columns is None:
@@ -15,14 +15,14 @@ def get_zp(year, selected_columns=None):
                                         usecols=selected_columns)
                 return df_zp
         else:
-            raise Exception('File "zielpersonen.csv" not in the folder "data". Please copy it there.')
+            raise Exception('File "zielpersonen.csv" not in the folder "data/input". Please copy it there.')
     else:
         raise Exception('Year not well defined')
 
 
 def get_overnight_trips(year, selected_columns=None):
     if year == 2015:
-        path_2_reisenmueb = os.path.join('..', 'data', 'reisenmueb.csv')
+        path_2_reisenmueb = os.path.join('..', 'data', 'input', 'reisenmueb.csv')
         if os.path.isfile(path_2_reisenmueb):
             with open(path_2_reisenmueb, 'r', encoding='latin1') as trips_with_overnight_file:
                 df_trips_with_overnight = pd.read_csv(trips_with_overnight_file,
@@ -31,6 +31,6 @@ def get_overnight_trips(year, selected_columns=None):
                                                       na_values=[-99])
                 return df_trips_with_overnight
         else:
-            Exception('File "reisenmueb.csv" not in the folder "data". Please copy it there.')
+            Exception('File "reisenmueb.csv" not in the folder "data/input". Please copy it there.')
     else:
         raise Exception('Year not well defined')

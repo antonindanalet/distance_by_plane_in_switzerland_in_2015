@@ -1,5 +1,8 @@
 from utils_mtmc.get_mtmc_files import *
 import numpy as np
+import pandas as pd
+from scipy.stats import norm
+import os
 
 
 def run_distance_by_plane_in_switzerland_in_2015():
@@ -62,7 +65,8 @@ def run_distance_by_plane_in_switzerland_in_2015():
     # For HHNR=333950, the distance is known, but not the country of destination.
     # For HHNR=488907, the destination is known but is the same as home.
     df_zp = df_zp[~df_zp['HHNR'].isin([333950, 488907])]
-    print('Basis total distance:', len(df_zp),
+    nb_of_obs = len(df_zp)
+    print('Basis total distance:', nb_of_obs,
           'persons who were asked about trips with overnights and with a valid information about the distance')
     # Result: 17054
     # Sum of weights of the detailed trips, without those missing details, in particular distance
@@ -71,34 +75,68 @@ def run_distance_by_plane_in_switzerland_in_2015():
     correction_factor_declared_detailed_trips = weight_declared_trips / weight_detailed_trips
     # Trips have been asked for 4 months on the phone in the MTMC and must be extrapolated for a year
     extrapolation_factor_4_months_to_1_year = 365.0 / 120
+    df_zp['WP_corrected'] = np.where(df_zp['with_trips'],
+                                     df_zp['WP'] * correction_factor_declared_detailed_trips,
+                                     df_zp['WP'])
+    df_zp['average_plane_dist'] = np.where(df_zp['with_trips'],
+                                           df_zp['total_distance_extrapolated']
+                                           * correction_factor_declared_detailed_trips
+                                           * extrapolation_factor_4_months_to_1_year,
+                                           0)
+    df_zp['average_plane_dist_private'] = np.where(df_zp['with_trips'],
+                                                   df_zp['total_distance_extrapolated_private']
+                                                   * correction_factor_declared_detailed_trips
+                                                   * extrapolation_factor_4_months_to_1_year,
+                                                   0)
+    df_zp['average_plane_dist_business'] = np.where(df_zp['with_trips'],
+                                                    df_zp['total_distance_extrapolated_business']
+                                                    * correction_factor_declared_detailed_trips
+                                                    * extrapolation_factor_4_months_to_1_year,
+                                                    0)
+    df_zp['average_plane_dist_other'] = np.where(df_zp['with_trips'],
+                                                 df_zp['total_distance_extrapolated_other']
+                                                 * correction_factor_declared_detailed_trips
+                                                 * extrapolation_factor_4_months_to_1_year,
+                                                 0)
+    weighted_avg, weighted_std = get_weighted_average_and_std(df_zp, 'average_plane_dist')
     print('Average distance made by plane per person in 2015, in km:',
-          (df_zp[df_zp['with_trips']]['WP'] * df_zp[df_zp['with_trips']]['total_distance_extrapolated']).sum() *
-          correction_factor_declared_detailed_trips /
-          (df_zp[df_zp['with_trips']]['WP'].sum() * correction_factor_declared_detailed_trips + df_zp[~df_zp['with_trips']]['WP'].sum())
-          * extrapolation_factor_4_months_to_1_year)
+          weighted_avg, ' (+/-', str(weighted_std) + ')')
     # Result: 5924.873511771452
-    # age_bins_with_trips = pd.cut(df_zp_with_trips['age'], [5, 17, 24, 44, 64, 79, 100])
-    # age_bins_without_trips = pd.cut(df_zp_without_trips['age'], [5, 17, 24, 44, 64, 79, 100])
-    # print(df_zp_with_trips.groupby(age_bins_with_trips).apply(lambda df:
-    #                                                           (df['WP'] * df['total_distance_extrapolated']).sum()) /
-    #       df_zp_with_trips.groupby(age_bins_with_trips)['WP'].sum() * correction_factor_declared_detailed_trips +
-    #       df_zp_without_trips.groupby(age_bins_without_trips)['WP'].sum())
-    # print('--- Among which; ---')
-    # print('Only private trips:',
-    #       (df_zp_with_trips['WP'] * df_zp_with_trips['total_distance_extrapolated_private']).sum() *
-    #       correction_factor_declared_detailed_trips /
-    #       (df_zp_with_trips['WP'].sum() * correction_factor_declared_detailed_trips + df_zp_without_trips['WP'].sum())
-    #       * extrapolation_factor_4_months_to_1_year)
-    # print('Only business trips:',
-    #       (df_zp_with_trips['WP'] * df_zp_with_trips['total_distance_extrapolated_business']).sum() *
-    #       correction_factor_declared_detailed_trips /
-    #       (df_zp_with_trips['WP'].sum() * correction_factor_declared_detailed_trips + df_zp_without_trips['WP'].sum())
-    #       * extrapolation_factor_4_months_to_1_year)
-    # print('Only other trips:',
-    #       (df_zp_with_trips['WP'] * df_zp_with_trips['total_distance_extrapolated_other']).sum() *
-    #       correction_factor_declared_detailed_trips /
-    #       (df_zp_with_trips['WP'].sum() * correction_factor_declared_detailed_trips + df_zp_without_trips['WP'].sum())
-    #       * extrapolation_factor_4_months_to_1_year)
+    # Define age categories (including names for CSV-files)
+    age_bins = pd.cut(df_zp['age'], [5, 17, 24, 44, 64, 79, 100],
+                      labels=['6-17 years', '18-24 years', '25-44 years', '45-64 years', '65-79 years',
+                              '80 years and over'])
+    # Compute results by age
+    output_by_age_as_series = df_zp.groupby(age_bins).apply(get_weighted_average_and_std, 'average_plane_dist')
+    # Save results as CSV-file
+    save_results_as_csv_file(output_by_age_as_series)
+    # Generate a figure with the results
+    print('--- Among which; ---')
+    weighted_avg_private, weighted_std_private = get_weighted_average_and_std(df_zp, 'average_plane_dist_private')
+    print('Only private trips:', weighted_avg_private, '(+/-', str(weighted_std_private) + ')')
+    print(df_zp.groupby(age_bins).apply(get_weighted_average_and_std, 'average_plane_dist_private'))
+    weighted_avg_business, weighted_std_business = get_weighted_average_and_std(df_zp, 'average_plane_dist_business')
+    print('Only business trips:', weighted_avg_business, '(+/-', str(weighted_std_business) + ')')
+    print(df_zp.groupby(age_bins).apply(get_weighted_average_and_std, 'average_plane_dist_business'))
+    weighted_avg_other, weighted_std_other = get_weighted_average_and_std(df_zp, 'average_plane_dist_other')
+    print('Only other trips:', weighted_avg_other, '(+/-', str(weighted_std_other) + ')')
+    print(df_zp.groupby(age_bins).apply(get_weighted_average_and_std, 'average_plane_dist_other'))
+
+
+def save_results_as_csv_file(output_by_age_as_series):
+    output_by_age_as_df = pd.DataFrame(output_by_age_as_series.tolist(),
+                                       columns=['Average distance made by plane per person in 2015, in km', '+/-'],
+                                       index=output_by_age_as_series.index)
+    output_by_age_as_df.index.names = ['Age category']
+    output_by_age_as_df.to_csv(os.path.join('..', 'data', 'output', 'distance_by_plane_by_age.csv'))
+
+
+def get_weighted_average_and_std(df_zp, name_variable):
+    nb_of_obs = len(df_zp['HHNR'].unique())
+    weighted_avg = (df_zp[name_variable] * df_zp['WP']).sum() / df_zp['WP_corrected'].sum()
+    variance = np.average((df_zp[name_variable] - weighted_avg) ** 2, weights=df_zp['WP'])
+    weighted_std = np.divide(norm.ppf(0.95) * 1.14 * np.sqrt(variance), np.sqrt(nb_of_obs))
+    return weighted_avg, weighted_std
 
 
 def get_zp_renamed():
