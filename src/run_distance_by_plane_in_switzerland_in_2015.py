@@ -128,7 +128,7 @@ def save_results_as_csv_file(output_by_age_as_series):
                                        columns=['Average distance made by plane per person in 2015, in km', '+/-'],
                                        index=output_by_age_as_series.index)
     output_by_age_as_df.index.names = ['Age category']
-    output_by_age_as_df.to_csv(os.path.join('..', 'data', 'output', 'distance_by_plane_by_age.csv'))
+    output_by_age_as_df.to_csv(os.path.join('..', 'data', 'output', 'distance_by_plane_by_age.csv'), sep=';')
 
 
 def get_weighted_average_and_std(df_zp, name_variable):
