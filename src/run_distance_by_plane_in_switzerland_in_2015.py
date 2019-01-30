@@ -125,44 +125,79 @@ def run_distance_by_plane_in_switzerland_in_2015():
 
 def generate_figure_by_age_by_trip_category(output_by_age_as_df_private, output_by_age_as_df_business,
                                             output_by_age_as_df_other):
-    df_by_age = pd.concat([output_by_age_as_df_private.iloc[:, 0].rename('Private trips'),
-                           output_by_age_as_df_business.iloc[:, 0].rename('Business trips'),
-                           output_by_age_as_df_other.iloc[:, 0].rename('Other')], axis=1)
+    dict_title = {'fr': "Distance totale$^1$ des voyages en avion par personne\nselon l'âge et le motif, en 2015",
+                  'en': 'Total distance$^1$ of trips by plane per person\nby age and purpose in 2015',
+                  'de': 'Gesamtdistanz$^1$ der Flugreisen pro Person\nnach Alter und Zweck, 2015'}
+    dict_bottom_text = {'fr': '$^1$ Voyages aller et retour et distances sur place.\n\n'
+                              'Base: 17 054 personnes cible interrogées dans le module supplémentaire\n"Voyages avec '
+                              'nuitées", avec indication valable de la distance\n\n'
+                              'Source: OFS, ARE - Microrecensement mobilité et transports (MRMT)',
+                        'en': '$^1$ Outward and return journeys and distances on the spot.\n\n'
+                              'Basis: 17 054 persons who where asked about trips with overnights and with a valid\n'
+                              'information about the distance\n\n'
+                              'Source: FSO, ARE - Mobility and Transport Microcensus (MTMC)',
+                        'de': '$^1$ Hinreise(n), Rückreise(n) und Distanzen vor ort.\n\n'
+                              'Basis: 17 054 Zielpersonen die zum Zusatzmodul Reisen mit Übernachtungen befragt '
+                              'wurden,\nmit gültigen Angaben zur Distanz\n\n'
+                              'Quelle: BFS, ARE – Mikrozensus Mobilität und Verkehr (MZMV)'}
+    dict_categories = {'en': ['Private trips', 'Business trips', 'Other'],
+                       'fr': ["Voyages d'ordre privé", "Voyages d'affaires", 'Autres'],
+                       'de': ['Privatreisen', 'Geschäftsreisen', 'übrige']}
     fso_colors = ['#A1D6EF', '#F07E00', '#CFD0D0']
-    df_by_age.plot.barh(stacked=True, color=fso_colors)
-    ax = plt.gca()
-    ax.invert_yaxis()
-    plt.ylabel('')
-    plt.title('Total distance of trips by plane per person\nby age category in 2015')
-    plt.legend(loc=4, mode='expand', ncol=3, bbox_to_anchor=(0., -0.2, 1., 0.102))
-    ax.xaxis.grid(True)
-    # Add "km" at the end of x-axis
-    ticklabelpad = plt.rcParams['xtick.major.pad']
-    ax.annotate('km', xy=(1, 0), xytext=(5, -2 * ticklabelpad), ha='left', va='top', xycoords='axes fraction',
-                textcoords='offset points')
-    # Add total km at the end of the bars
-    i = 0
-    for total_km in df_by_age['Private trips'] + df_by_age['Business trips'] + df_by_age['Other']:
-        ax.text(total_km + 100, i + 0.07, str(round(total_km)), fontweight='bold')
-        i += 1
-    # Remove top and right axis
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    # Add values in the stack bars
-    labels = []
-    for trip_category in df_by_age.columns:
-        for age_category in df_by_age.index:
-            label = int(round(df_by_age[trip_category][age_category]))
-            labels.append(label)
-    patches = ax.patches
-    for label, rect in zip(labels, patches):
-        width = rect.get_width()
-        if width > 700:
-            x = rect.get_x()
-            y = rect.get_y()
-            height = rect.get_height()
-            ax.text(x+width/2., y+height/2., label, ha='center', va='center')
-    plt.savefig(os.path.join('..', 'data', 'output', 'distance_by_plane_by_age.png'), bbox_inches='tight')
+    dict_y_ticks = {'en': ['6-17 years', '18-24 years', '25-44 years', '45-64 years', '65-79 years',
+                           '80 years and over'],
+                    'fr': ['6-17 ans', '18-24 ans', '25-44 ans', '45-64 ans', '65-79 ans', '80 ans et plus'],
+                    'de': ['6-17 Jahre', '18-24 Jahre', '25-44 Jahre', '45-64 Jahre', '65-79 Jahre',
+                           '80 Jahre und mehr']}
+    for language in ['fr', 'de', 'en']:
+        df_by_age = pd.concat([output_by_age_as_df_private.iloc[:, 0].rename(dict_categories[language][0]),
+                               output_by_age_as_df_business.iloc[:, 0].rename(dict_categories[language][1]),
+                               output_by_age_as_df_other.iloc[:, 0].rename(dict_categories[language][2])], axis=1)
+
+        df_by_age.plot.barh(stacked=True, color=fso_colors)
+        ax = plt.gca()
+        ax.invert_yaxis()
+        plt.ylabel('')
+        plt.yticks(range(len(dict_y_ticks[language])), dict_y_ticks[language])
+        plt.title(dict_title[language])
+        plt.legend(loc=4, mode='expand', ncol=3, bbox_to_anchor=(0., -0.2, 1., 0.102))
+        ax.xaxis.grid(True)
+        # Add "km" at the end of x-axis
+        ticklabelpad = plt.rcParams['xtick.major.pad']
+        ax.annotate('km', xy=(1, 0), xytext=(5, -2 * ticklabelpad), ha='left', va='top', xycoords='axes fraction',
+                    textcoords='offset points')
+        # Add total km at the end of the bars
+        i = 0
+        for total_km in df_by_age[dict_categories[language][0]] + \
+                        df_by_age[dict_categories[language][1]] + \
+                        df_by_age[dict_categories[language][2]]:
+            ax.text(total_km + 100, i + 0.07, str(round(total_km)), fontweight='bold')
+            i += 1
+        # Remove top and right axis
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        # Add values in the stack bars
+        labels = []
+        for trip_category in df_by_age.columns:
+            for age_category in df_by_age.index:
+                label = int(round(df_by_age[trip_category][age_category]))
+                labels.append(label)
+        patches = ax.patches
+        for label, rect in zip(labels, patches):
+            width = rect.get_width()
+            if width > 700:
+                x = rect.get_x()
+                y = rect.get_y()
+                height = rect.get_height()
+                ax.text(x+width/2., y+height/2., label, ha='center', va='center')
+        # Add text below the figure
+        if language == 'fr':
+            plt.text(-1850, 8.5, dict_bottom_text[language], ha='left')
+        elif language == 'de':
+            plt.text(-2450, 8.5, dict_bottom_text[language], ha='left')
+        else:
+            plt.text(-2300, 8.5, dict_bottom_text[language], ha='left')
+        plt.savefig(os.path.join('..', 'data', 'output', 'distance_by_plane_by_age_' + language + '.png'), bbox_inches='tight')
 
 
 def decompose_distances_by_categories_of_trips(df_zp, age_bins):
