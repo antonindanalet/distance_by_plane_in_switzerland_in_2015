@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm
 import os
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FormatStrFormatter
 
 
 def run_distance_by_plane_in_switzerland_in_2015():
@@ -109,26 +111,101 @@ def run_distance_by_plane_in_switzerland_in_2015():
     # Compute results by age
     output_by_age_as_series = df_zp.groupby(age_bins).apply(get_weighted_average_and_std, 'average_plane_dist')
     # Save results as CSV-file
-    save_results_as_csv_file(output_by_age_as_series)
+    save_results_as_csv_file(output_by_age_as_series,
+                             col_title='Average distance made by plane per person in 2015, in km')
+    # Decompose between private, business and other trips and save as CSV, by age category
+    output_by_age_as_df_private, \
+    output_by_age_as_df_business, \
+    output_by_age_as_df_other = decompose_distances_by_categories_of_trips(df_zp, age_bins)
     # Generate a figure with the results
-    print('--- Among which; ---')
+    generate_figure_by_age_by_trip_category(output_by_age_as_df_private,
+                                            output_by_age_as_df_business,
+                                            output_by_age_as_df_other)
+
+
+def generate_figure_by_age_by_trip_category(output_by_age_as_df_private, output_by_age_as_df_business,
+                                            output_by_age_as_df_other):
+    df_by_age = pd.concat([output_by_age_as_df_private.iloc[:, 0].rename('Private trips'),
+                           output_by_age_as_df_business.iloc[:, 0].rename('Business trips'),
+                           output_by_age_as_df_other.iloc[:, 0].rename('Other')], axis=1)
+    fso_colors = ['#A1D6EF', '#F07E00', '#CFD0D0']
+    df_by_age.plot.barh(stacked=True, color=fso_colors)
+    ax = plt.gca()
+    ax.invert_yaxis()
+    plt.ylabel('')
+    plt.title('Total distance of trips by plane per person\nby age category in 2015')
+    plt.legend(loc=4, mode='expand', ncol=3, bbox_to_anchor=(0., -0.2, 1., 0.102))
+    ax.xaxis.grid(True)
+    # Add "km" at the end of x-axis
+    ticklabelpad = plt.rcParams['xtick.major.pad']
+    ax.annotate('km', xy=(1, 0), xytext=(5, -2 * ticklabelpad), ha='left', va='top', xycoords='axes fraction',
+                textcoords='offset points')
+    # Add total km at the end of the bars
+    i = 0
+    for total_km in df_by_age['Private trips'] + df_by_age['Business trips'] + df_by_age['Other']:
+        ax.text(total_km + 100, i + 0.07, str(round(total_km)), fontweight='bold')
+        i += 1
+    # Remove top and right axis
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    # Add values in the stack bars
+    labels = []
+    for trip_category in df_by_age.columns:
+        for age_category in df_by_age.index:
+            label = int(round(df_by_age[trip_category][age_category]))
+            labels.append(label)
+    patches = ax.patches
+    for label, rect in zip(labels, patches):
+        width = rect.get_width()
+        if width > 700:
+            x = rect.get_x()
+            y = rect.get_y()
+            height = rect.get_height()
+            ax.text(x+width/2., y+height/2., label, ha='center', va='center')
+    plt.savefig(os.path.join('..', 'data', 'output', 'distance_by_plane_by_age.png'), bbox_inches='tight')
+
+
+def decompose_distances_by_categories_of_trips(df_zp, age_bins):
+    print('--- Among which ---')
+    ''' Private trips '''
     weighted_avg_private, weighted_std_private = get_weighted_average_and_std(df_zp, 'average_plane_dist_private')
     print('Only private trips:', weighted_avg_private, '(+/-', str(weighted_std_private) + ')')
-    print(df_zp.groupby(age_bins).apply(get_weighted_average_and_std, 'average_plane_dist_private'))
+    # Compute results by age
+    output_by_age_as_series_private = df_zp.groupby(age_bins).apply(get_weighted_average_and_std,
+                                                                    'average_plane_dist_private')
+    output_by_age_as_df_private = save_results_as_csv_file(output_by_age_as_series_private,
+                                                           col_title='Average distance made by plane per person in '
+                                                                     '2015 (private trips), in km',
+                                                           extra_path_name='_private')
+    ''' Business trips '''
     weighted_avg_business, weighted_std_business = get_weighted_average_and_std(df_zp, 'average_plane_dist_business')
     print('Only business trips:', weighted_avg_business, '(+/-', str(weighted_std_business) + ')')
-    print(df_zp.groupby(age_bins).apply(get_weighted_average_and_std, 'average_plane_dist_business'))
+    output_by_age_as_series_business = df_zp.groupby(age_bins).apply(get_weighted_average_and_std,
+                                                                     'average_plane_dist_business')
+    output_by_age_as_df_business = save_results_as_csv_file(output_by_age_as_series_business,
+                                                            col_title='Average distance made by plane per person in '
+                                                                      '2015 (business trips), in km',
+                                                            extra_path_name='_business')
+    ''' Other trips '''
     weighted_avg_other, weighted_std_other = get_weighted_average_and_std(df_zp, 'average_plane_dist_other')
     print('Only other trips:', weighted_avg_other, '(+/-', str(weighted_std_other) + ')')
-    print(df_zp.groupby(age_bins).apply(get_weighted_average_and_std, 'average_plane_dist_other'))
+    output_by_age_as_series_other = df_zp.groupby(age_bins).apply(get_weighted_average_and_std,
+                                                                  'average_plane_dist_other')
+    output_by_age_as_df_other = save_results_as_csv_file(output_by_age_as_series_other,
+                                                         col_title='Average distance made by plane per person in 2015 '
+                                                                   '(other trips), in km',
+                                                         extra_path_name='_other')
+    return output_by_age_as_df_private, output_by_age_as_df_business, output_by_age_as_df_other
 
 
-def save_results_as_csv_file(output_by_age_as_series):
+def save_results_as_csv_file(output_by_age_as_series, col_title, extra_path_name=''):
     output_by_age_as_df = pd.DataFrame(output_by_age_as_series.tolist(),
-                                       columns=['Average distance made by plane per person in 2015, in km', '+/-'],
+                                       columns=[col_title, '+/-'],
                                        index=output_by_age_as_series.index)
     output_by_age_as_df.index.names = ['Age category']
-    output_by_age_as_df.to_csv(os.path.join('..', 'data', 'output', 'distance_by_plane_by_age.csv'), sep=';')
+    output_by_age_as_df.to_csv(os.path.join('..', 'data', 'output',
+                                            'distance_by_plane_by_age' + extra_path_name + '.csv'), sep=';')
+    return output_by_age_as_df
 
 
 def get_weighted_average_and_std(df_zp, name_variable):
