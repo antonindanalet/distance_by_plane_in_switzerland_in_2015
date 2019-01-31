@@ -1,10 +1,8 @@
 from utils_mtmc.get_mtmc_files import *
 import numpy as np
 import pandas as pd
-from scipy.stats import norm
 import os
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FormatStrFormatter
 
 
 def run_distance_by_plane_in_switzerland_in_2015():
@@ -110,9 +108,8 @@ def run_distance_by_plane_in_switzerland_in_2015():
     save_results_as_csv_file(output_by_age_as_series,
                              col_title='Average distance made by plane per person in 2015, in km')
     # Decompose between private, business and other trips and save as CSV, by age category
-    output_by_age_as_df_private, \
-    output_by_age_as_df_business, \
-    output_by_age_as_df_other = decompose_distances_by_categories_of_trips(df_zp, age_bins)
+    output_by_age_as_df_private, output_by_age_as_df_business, output_by_age_as_df_other = \
+        decompose_distances_by_categories_of_trips(df_zp, age_bins)
     # Generate a figure with the results
     generate_figure_by_age_by_trip_category(output_by_age_as_df_private,
                                             output_by_age_as_df_business,
@@ -164,9 +161,10 @@ def generate_figure_by_age_by_trip_category(output_by_age_as_df_private, output_
                     textcoords='offset points')
         # Add total km at the end of the bars
         i = 0
-        for total_km in df_by_age[dict_categories[language][0]] + \
-                        df_by_age[dict_categories[language][1]] + \
-                        df_by_age[dict_categories[language][2]]:
+        for total_km in \
+                df_by_age[dict_categories[language][0]] + \
+                df_by_age[dict_categories[language][1]] + \
+                df_by_age[dict_categories[language][2]]:
             ax.text(total_km + 100, i + 0.07, str(round(total_km)), fontweight='bold')
             i += 1
         # Remove top and right axis
@@ -193,7 +191,8 @@ def generate_figure_by_age_by_trip_category(output_by_age_as_df_private, output_
             plt.text(-2450, 8.5, dict_bottom_text[language], ha='left')
         else:
             plt.text(-2300, 8.5, dict_bottom_text[language], ha='left')
-        plt.savefig(os.path.join('..', 'data', 'output', 'distance_by_plane_by_age_' + language + '.png'), bbox_inches='tight')
+        plt.savefig(os.path.join('..', 'data', 'output', 'distance_by_plane_by_age_' + language + '.png'),
+                    bbox_inches='tight')
 
 
 def decompose_distances_by_categories_of_trips(df_zp, age_bins):
@@ -244,7 +243,7 @@ def get_weighted_average_and_std(df_zp, name_variable):
     weighted_avg = (df_zp[name_variable] * df_zp['WP_corrected']).sum() / df_zp['WP_corrected'].sum()
     variance = np.divide((df_zp['WP_corrected'] * ((df_zp[name_variable] - weighted_avg) ** 2)).sum(),
                          df_zp['WP_corrected'].sum() - 1)
-    weighted_std = np.divide(norm.ppf(0.95) * 1.14 * np.sqrt(variance), np.sqrt(nb_of_obs))
+    weighted_std = np.divide(1.645 * 1.14 * np.sqrt(variance), np.sqrt(nb_of_obs))
     return weighted_avg, weighted_std
 
 
