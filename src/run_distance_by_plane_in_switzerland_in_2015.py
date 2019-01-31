@@ -126,8 +126,9 @@ def generate_figure_by_age_by_trip_category(output_by_age_as_df_private, output_
                               'nuitées", avec indication valable de la distance\n\n'
                               'Source: OFS, ARE - Microrecensement mobilité et transports (MRMT)',
                         'en': '$^1$ Outward and return journeys and distances at destination.\n\n'
-                              'Basis: 17 054 persons who where asked about trips with overnight stays and providing a valid\n'
-                              'information about the distance covered\n\n'
+                              'Basis: 17 054 persons who were asked about trips with '
+                              'overnight stays and could provide\n'
+                              'valid information about the distance covered\n\n'
                               'Source: FSO, ARE - Mobility and Transport Microcensus (MTMC)',
                         'de': '$^1$ Hinreise(n), Rückreise(n) und Distanzen vor Ort.\n\n'
                               'Basis: 17 054 Zielpersonen die zum Zusatzmodul Reisen mit Übernachtungen befragt '
