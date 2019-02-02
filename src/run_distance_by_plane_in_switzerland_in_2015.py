@@ -235,7 +235,7 @@ def save_results_as_csv_file(output_by_age_as_series, col_title, extra_path_name
                                        index=output_by_age_as_series.index)
     output_by_age_as_df.index.names = ['Age category']
     output_by_age_as_df.to_csv(os.path.join('..', 'data', 'output',
-                                            'distance_by_plane_by_age' + extra_path_name + '.csv'), sep=';')
+                                            'distance_by_plane_by_age' + extra_path_name + '.csv'))
     return output_by_age_as_df
 
 
