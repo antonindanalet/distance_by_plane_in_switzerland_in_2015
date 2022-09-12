@@ -20,7 +20,3 @@ For it to produce the results, you also need the raw data of the Transport and M
 Please copy the files <em>zielpersonen.csv</em> and <em>reisenmueb.csv</em> that you receive from the Swiss Federal Statistical Office (FSO) in the folder "<a href="https://github.com/antonindanalet/distance_by_plane_in_switzerland_in_2015/tree/master/data/input">data/input</a>". Then run <em><a href="https://github.com/antonindanalet/distance_by_plane_in_switzerland_in_2015/blob/master/src/run_distance_by_plane_in_switzerland_in_2015.py">run_distance_by_plane_in_switzerland_in_2015.py</a></em>. 
 
 DO NOT commit or share in any way these two CSV-files! These are personal data.
-
-## Contact
-
-Please don't hesitate to contact me if you have questions or comments about this code: antonin.danalet@are.admin.ch
